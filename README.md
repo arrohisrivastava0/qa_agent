@@ -1,4 +1,4 @@
-```markdown
+
 # Multi-Agent Financial Assistant
 
 A multi-agent pipeline for enterprise financial analysis using LangGraph, LangChain, and Groq (Llama 3.1). Three specialized AI agents collaborate in sequence to retrieve context, perform financial reasoning, and generate structured reports — mimicking real-world enterprise financial workflows.
