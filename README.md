@@ -1,77 +1,73 @@
-```markdown
-# Multi-Agent Financial Assistant
+# Enterprise Knowledge Assistant
 
-A multi-agent pipeline for enterprise financial analysis using LangGraph, LangChain, and Groq (Llama 3.1). Three specialized AI agents collaborate in sequence to retrieve context, perform financial reasoning, and generate structured reports — mimicking real-world enterprise financial workflows.
+A multi-agent LLM pipeline built with LangGraph for enterprise financial document Q&A. Three specialized agents — retriever, analyst, and reporter — collaborate through a stateful graph to process queries end-to-end and return structured reports.
 
 ## Architecture
 
-User Query → Retriever Agent → Analyst Agent → Reporter Agent → Structured Report
+```
+Query → [Retriever Agent] → [Analyst Agent] → [Reporter Agent] → Structured Report
+              ↓                    ↓                   ↓
+       Entity extraction    Financial reasoning    Executive summary
+       & context building   & trend analysis       Key findings
+                                                   Recommendations
+```
 
-Each agent is a specialized LLM node in a LangGraph state graph:
-- **Retriever Agent** — Identifies key financial entities, metrics, and time periods from the query
-- **Analyst Agent** — Performs financial reasoning, calculates metrics, identifies trends and anomalies
-- **Reporter Agent** — Generates a structured business report with executive summary, key findings, and recommendations
+Built with LangGraph's `StateGraph` for inter-agent state management. Each agent reads from and writes to a shared `AgentState`, passing structured context through the pipeline.
+
+Supports **LangSmith tracing** for prompt observability and agent workflow debugging — set `LANGSMITH_API_KEY` in `.env` to activate.
 
 ## Tech Stack
 
-- **LangGraph** — Agent orchestration and state graph management
-- **LangChain** — LLM abstraction and message formatting
-- **Groq (Llama 3.1 8B)** — Fast LLM inference backend
+- **LangGraph** — agent orchestration via StateGraph
+- **LangChain + Groq** — LLM inference (LLaMA 3.1)
 - **FastAPI** — REST API serving
-- **Uvicorn** — ASGI server
-- **Python-dotenv** — Environment variable management
-
-## Project Structure
-
-multi-agent-financial-assistant/
-├── agents/
-│   ├── retriever_agent.py   # Entity and context extraction
-│   ├── analyst_agent.py     # Financial reasoning and metric calculation
-│   └── reporter_agent.py    # Structured report generation
-├── graph.py                 # LangGraph state graph definition
-├── main.py                  # FastAPI application
-├── requirements.txt
-└── .env                     # API keys (not committed)
+- **LangSmith** — prompt tracing and observability (optional)
 
 ## Setup
 
+```bash
 git clone https://github.com/arrohisrivastava0/qa_agent.git
 cd qa_agent
-python -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
-
-Create a `.env` file in the root directory:
-
-GROQ_API_KEY=your_groq_api_key_here
-
-Get a free API key at https://console.groq.com
-
-## Running the API
-
+cp .env.example .env
+# Add your GROQ_API_KEY to .env
 uvicorn main:app --reload
+```
 
-Server starts at http://127.0.0.1:8000
+## API Usage
 
-## Usage
+**POST** `/analyze`
 
-curl -X POST http://127.0.0.1:8000/analyze \
-  -H "Content-Type: application/json" \
-  -d '{"query": "What are the cost reduction opportunities in Q4 enterprise spending?"}'
-
-## Sample Output
-
+```json
 {
-  "query": "What are the cost reduction opportunities in Q4 enterprise spending?",
-  "report": "Financial Report: Cost Reduction Opportunities in Q4 Enterprise Spending. Executive Summary: ...",
+  "query": "What were the revenue trends for Q3 2024?"
+}
+```
+
+**Response**
+
+```json
+{
+  "query": "What were the revenue trends for Q3 2024?",
+  "report": "## Executive Summary\n...\n## Key Findings\n...\n## Recommendations\n...",
   "agent_logs": [
     "[Retriever] Identified key entities from query",
     "[Analyst] Completed financial reasoning",
     "[Reporter] Generated final report"
   ]
 }
+```
 
-## Why This Matters
+## Project Structure
 
-Enterprise applications like SAP S/4HANA deal with large volumes of financial data across controlling and cost management modules. This project demonstrates how multi-agent LLM pipelines can automate financial analysis workflows — reducing manual effort and surfacing actionable insights from unstructured financial queries.
+```
+qa_agent/
+├── main.py              # FastAPI app + LangSmith tracing setup
+├── graph.py             # LangGraph StateGraph definition
+├── agents/
+│   ├── retriever_agent.py   # Entity extraction & context retrieval
+│   ├── analyst_agent.py     # Financial reasoning & analysis
+│   └── reporter_agent.py    # Structured report generation
+├── requirements.txt
+└── .env.example
 ```

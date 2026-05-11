@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -5,7 +6,12 @@ from graph import build_graph
 
 load_dotenv()
 
-app = FastAPI(title="Multi-Agent Financial Assistant")
+if os.getenv("LANGSMITH_API_KEY"):
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT", "enterprise-knowledge-assistant")
+
+app = FastAPI(title="Enterprise Knowledge Assistant")
+
 graph = build_graph()
 
 class QueryRequest(BaseModel):
@@ -28,4 +34,4 @@ def analyze(request: QueryRequest):
 
 @app.get("/")
 def root():
-    return {"status": "Multi-Agent Financial Assistant running"}
+    return {"status": "Enterprise Knowledge Assistant running"}
