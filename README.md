@@ -21,6 +21,7 @@ Supports **LangSmith tracing** for prompt observability and agent workflow debug
 - **LangGraph** — agent orchestration via StateGraph
 - **LangChain + Groq** — LLM inference (LLaMA 3.1)
 - **FastAPI** — REST API serving
+
 - **LangSmith** — prompt tracing and observability (optional)
 
 ## Setup
@@ -29,6 +30,7 @@ Supports **LangSmith tracing** for prompt observability and agent workflow debug
 git clone https://github.com/arrohisrivastava0/qa_agent.git
 cd qa_agent
 pip install -r requirements.txt
+
 cp .env.example .env
 # Add your GROQ_API_KEY to .env
 uvicorn main:app --reload
